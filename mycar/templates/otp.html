@@ -1,0 +1,30 @@
+{% load static %}
+<html>
+<head>
+  <title>Login/Sign Up Form</title>
+  <link rel="stylesheet" href="{%static 'otp_css/login_signup.css' %}">
+
+</head>
+<body>
+  <div class="container" id="container">
+    <!-- sign in page -->
+    <div class="form-container sign-in-container">
+      <form method="POST" action='{%url "otp" %}'class="form" id="login">
+        {% csrf_token %}
+        <h1 class="form__title">Login</h1>
+        <p style="color: red;">{{msg}}</p>
+        <div class="form__input-group">
+          <input type="text" class="form__input" name="uotp" id="uotp" maxlength="20" placeholder="OTP" required> 
+        </div>
+        <input type="hidden" name="otp" value="{{otp}}" id="">
+        <div class="form__input-group">
+          <button type="submit" class="form__button">Submit</button>
+        </div>
+     </form>
+    </div>
+    
+   </div>
+ </div>
+  <script src='{%static "otp_js/login.js" %}'></script> 
+</body>
+</html>

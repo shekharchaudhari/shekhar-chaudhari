@@ -1,0 +1,40 @@
+{% load static%}
+<html>
+    <head>
+      <title>forgot password</title>
+      <link rel="stylesheet" href='{%static "assets/change_css/change.css" %}'>
+    
+    </head>
+    <body>
+
+
+<div class="mainDiv">
+    <div class="cardStyle">
+      <form action='{%url "forgot" %}' method="post" >
+        {% csrf_token %}
+        <img src="" id="signupLogo"/>
+        
+        <h2 class="formTitle">
+          Forgot password
+          <p style="color: red;">{{msg}}</p>
+        </h2>
+        
+        
+      <div class="inputDiv">
+        <label class="inputLabel" for="email">Enter email id</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      
+      <div class="buttonWrapper">
+        <button type="submit" id="submitButton" onclick="validateSignupForm()" class="submitButton pure-button pure-button-primary">
+          <span>Continue</span>
+          <span id="loader"></span>
+        </button>
+      </div>
+        
+    </form>
+    </div>
+  </div>
+  <script src='{%static "assets/change_js/change.js" %}'></script> 
+</body>
+</html>

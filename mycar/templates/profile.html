@@ -1,0 +1,66 @@
+{% extends 'header.html' %}
+
+{% block content %}
+
+{% load static %}
+<html>
+    <head>
+        <title>Edit profile</title>
+        <link rel="stylesheet" href='{%static "assets/profile_css/profile.css" %}'>
+    </head>
+<body></body>    
+
+<div class="container-xl px-4 mt-4">
+    <!-- Account page navigation-->
+    <hr class="mt-0 mb-4">
+    <div class="row">
+        <div class="col-xl-3">
+        </div>
+        <div class="col-xl-8">
+            <!-- Account details card-->
+            <div class="card mb-4">
+                <div class="card-header">Account Details</div>
+                <p style=" color:red">{{msg}}</p>
+                <div class="card-body">
+                    <form action="{% url 'profile' %}" method = "POST">
+                        {% csrf_token %}
+                        <!-- Form Group (username)-->
+                        <div class="mb-3">
+                            <label class="small mb-1" for="inputUsername">Username (how your name will appear to other users on the site)</label>
+                            <input class="form-control" id="inputUsername" type="text" name="uname" placeholder="Enter your username" value="{{uid.uname}}">
+                       
+                        <!-- Form Group (email address)-->
+                        <div class="mb-3">
+                            <label class="small mb-1" for="inputEmailAddress">Email address</label>
+                            <input class="form-control" id="inputEmailAddress" type="email" name="email" placeholder="{{uid.email}}"  value="{{uid.email}}" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="small mb-1" for="inputEmailAddress">Address</label>
+                            <input class="form-control" id="inputEmailAddress" type="text" name="address" placeholder="Enter your address" value="{{uid.address}}">
+                        </div>
+                        
+                        <!-- Form Row-->
+                        <div class="row gx-3 mb-3">
+                            <!-- Form Group (mobile number)-->
+                            <div class="col-md-6">
+                                <label class="small mb-1" for="inputPhone">mobile number</label>
+                                <input class="form-control" id="inputPhone" type="tel" name="mobile" placeholder="Enter your phone number" value="{{uid.mobile}}">
+                            </div>
+                            <!-- Form Group (birthday)-->
+                            <div class="col-md-6">
+                                <label class="small mb-1" for="inputBirthday">Birthday</label>
+                                <input class="form-control" id="inputBirthday" type="text" name="birthday" placeholder="Enter your birthday" value="06/10/1988">
+                            </div>
+                        </div>
+                        <!-- Save changes button-->
+                        <button class="btn btn-primary" type="submit">Save changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+{% endblock %}
