@@ -1,7 +1,10 @@
-from tempfile import tempdir
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from .models import *
+import razorpay
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponseBadRequest
+
 from django.conf import settings
 from django.core.mail import send_mail
 from random import randrange
@@ -9,8 +12,8 @@ from random import randrange
 # Create your views here.
 
 def home(request):
-  
-    return render(request,'index.html')
+    cars = Car.objects.all()
+    return render(request,'index.html',{'cars':cars})
     
 def signup(request):
   
@@ -63,14 +66,14 @@ def otp(request):
 def login(request):
     try: 
         uid = User.objects.get(email=request.session['email'])
-        return render(request,'dashboard1.html',{'uid':uid})
+        return render(request,'dashboard.html',{'uid':uid})
     except:    
         if request.method == "POST":
             try:
                 uid = User.objects.get(email=request.POST['email'])
                 if request.POST['password'] == uid.password:
                     request.session['email'] = request.POST['email']
-                    return render(request,'dashboard1.html',{'uid':uid})
+                    return render(request,'dashboard.html',{'uid':uid})
                 return render(request, 'login_signup.html',{'msg':'invalid password','uid':uid})
             except:
                 return render(request, 'login_signup.html',{'msg':'email not registered!!','uid':uid})
@@ -78,17 +81,25 @@ def login(request):
 
    
 def logout(request):
-    del request.session['email']
-    return render(request,'login_signup.html')
+    try:
+        uid = User.objects.get(email=request.session['email'])
+        del request.session['email']
+        return render(request,'login_signup.html')
+    except:
+        return render(request,'index.html')
+
+            
 
 def changepass(request):
     uid = User.objects.get(email=request.session['email'])
     if request.method == "POST":
-        if request.POST['password'] == request.POST['cpassword']:
-            uid.password = request.POST['password']
-            uid.save()
-            return render(request,'changepass.html',{'msg':'password changed sucessfully.','uid':uid})
-        return render(request,'changepass.html',{'msg':'password does not match.','uid':uid})    
+        if request.POST['opassword'] == uid.password:
+            if request.POST['password'] == request.POST['cpassword']:
+                uid.password = request.POST['password']
+                uid.save()
+                return render(request,'changepass.html',{'msg':'password changed sucessfully.','uid':uid})
+            return render(request,'changepass.html',{'msg':'password does not match.','uid':uid})
+        return render(request,'changepass.html',{'msg':'Old Password is incorrect','uid':uid})    
     return render(request,'changepass.html',{'uid':uid})
         
 def forgot(request):  
@@ -120,3 +131,114 @@ def profile(request):
         uid.save()    
         return render(request,'profile.html',{'uid':uid,'msg':'Profile has been updated'})
     return render(request,'profile.html',{'uid':uid})
+
+def pricing(request):
+    return render(request,'pricing.html')   
+
+def dash(request):
+    uid = User.objects.get(email=request.session['email'])
+    return render(request,'dashboard.html',{'uid':uid})      
+
+def contact(request):
+    uid = User.objects.get(email=request.session['email'])
+    return render(request,'contact.html',{'uid':uid})
+
+def rent_car(request):
+    try:    
+        uid = User.objects.get(email=request.session['email'])
+        cars = Car.objects.all()
+        if request.method == "POST":
+            Trip.objects.create(
+                users = uid,
+                pick_loc = request.POST['pick_loc'],
+                drop_loc = request.POST['drop_loc'],
+                p_date = request.POST['p_date'],
+                d_date = request.POST['d_date'],
+                pick_time = request.POST['pick_time'],
+                )
+            return render(request,'cars.html',{'uid':uid, 'cars':cars}) 
+        return render(request,'dashboard.html',{'uid':uid})       
+    except: 
+        return render(request,'login_signup.html')
+
+razorpay_client = razorpay.Client(
+    auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
+
+def summary(request,pk):
+    uid = User.objects.get(email=request.session['email'])
+    cars = Car.objects.get(id=pk)
+    trip = Trip.objects.filter(users=uid)[::-1][0]
+    book = Book.objects.create(
+        user = uid,
+        car = cars,
+        trip = trip,
+        amount = cars.p_hour
+    )
+    currency = 'INR'
+    amount = cars.p_hour*100  # Rs. 200
+ 
+    # Create a Razorpay Order
+    razorpay_order = razorpay_client.order.create(dict(amount=amount,
+                                                       currency=currency,
+                                                       payment_capture='0'))
+ 
+    # order id of newly created order.
+    razorpay_order_id = razorpay_order['id']
+    callback_url = f'paymenthandler/{book.id}'
+ 
+    # we need to pass these details to frontend.
+    context = {}
+    context['razorpay_order_id'] = razorpay_order_id
+    context['razorpay_merchant_key'] = settings.RAZOR_KEY_ID
+    context['razorpay_amount'] = amount
+    context['currency'] = currency
+    context['callback_url'] = callback_url
+    context['cars'] = cars
+    context['uid'] = uid
+    context['trip'] = trip
+    return render(request,'summary.html',context)
+
+
+@csrf_exempt
+def paymenthandler(request,pk):
+ 
+    # only accept POST request.
+    if request.method == "POST":
+        try:
+            book = Book.objects.get(id=pk)
+            # get the required parameters from post request.
+            payment_id = request.POST.get('razorpay_payment_id', '')
+            razorpay_order_id = request.POST.get('razorpay_order_id', '')
+            signature = request.POST.get('razorpay_signature', '')
+            params_dict = {
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': signature
+            }
+ 
+            # verify the payment signature.
+            result = razorpay_client.utility.verify_payment_signature(
+                params_dict)
+            amount = book.amount*100  # Rs. 200
+            try:
+
+                # capture the payemt
+                razorpay_client.payment.capture(payment_id, amount)
+                book.pay_id = payment_id
+                book.verify = True
+                book.save()
+                # render success page on successful caputre of payment
+                return render(request, 'success.html')
+            except:
+
+                # if there is an error while capturing payment.
+                return render(request, 'fail.html')
+           
+        except:
+ 
+            # if we don't find the required parameters in POST data
+            return HttpResponseBadRequest()
+    else:
+       # if other than POST request is made.
+        return HttpResponseBadRequest()
+

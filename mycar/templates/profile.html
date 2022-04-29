@@ -1,14 +1,11 @@
-{% extends 'header.html' %}
+{% extends 'header1.html' %}
+
+{% load static %}
 
 {% block content %}
 
-{% load static %}
-<html>
-    <head>
-        <title>Edit profile</title>
-        <link rel="stylesheet" href='{%static "assets/profile_css/profile.css" %}'>
-    </head>
-<body></body>    
+
+  
 
 <div class="container-xl px-4 mt-4">
     <!-- Account page navigation-->
@@ -61,6 +58,5 @@
         </div>
     </div>
 </div>
-</body>
-</html>
+
 {% endblock %}

@@ -1,0 +1,123 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <title>Document</title>
+    <link rel="stylesheet" href='{% static "summary.css" %}'>
+</head>
+<body>
+    <div id="invoiceholder">
+
+        <div id="headerimage"></div>
+        <div id="invoice" class="effect2">
+          
+          <div id="invoice-top">
+            <div class="logo" style="background-image:url('{{cars.car_pic.url}}');"></div>
+            <div class="info">
+              <h1>{{cars.car_type}}</h1><br>
+              <h2><i class='fas fa-gas-pump'></i>&nbsp;&nbsp;&nbsp;{{cars.fuel_type}}</h2>
+            </div><!--End Info-->
+            <div class="title">
+              <h1>Invoice #1069</h1>
+              <p>Date/Time: <span id="datetime"></span></p>
+            </div><!--End Title-->
+          </div><!--End InvoiceTop-->
+      
+      
+          
+          <div id="invoice-mid">
+            
+            <div class="clientlogo" style="background-image:url('{{uid.pic.url}}');"></div>
+            <div class="info">
+              <h2>{{uid.uname}}</h2>
+              <p>{{uid.email}}</br>
+                 {{uid.mobile}}</p>
+            </div>
+      
+            <div id="project">
+              <h2>{{trip.pick_loc}}&nbsp;&nbsp;&nbsp; to &nbsp;&nbsp;&nbsp;{{trip.drop_loc}}</h2><br>
+              <h2>pickup date :&nbsp;&nbsp;&nbsp;{{trip.p_date}}</h2><br>
+                <h2>dropoff_date :&nbsp;&nbsp;&nbsp;{{trip.p_date}}</h2><br>
+
+              
+              <h2>Pickup Time :&nbsp;&nbsp;&nbsp;{{trip.pick_time}}</h2>
+
+            </div>   
+      
+          </div><!--End Invoice Mid-->
+          
+          <div id="invoice-bot">
+            
+            <div id="table">
+              <table>
+                <tr class="tabletitle">
+                  <td class="item"><h2>Car model</h2></td>
+                  <td class="Rate"><h2>Per/hour Rate</h2></td>
+                  <td class="subtotal"><h2>Sub-total</h2></td>
+                </tr>
+                
+                <tr class="service">
+                  <td class="tableitem"><p class="itemtext">{{cars.car_type}}</p></td>
+                  <td class="tableitem"><p class="itemtext">{{cars.p_hour}}</p></td>
+                  <td class="tableitem"><p class="itemtext">{{cars.p_hour}}</p></td>
+                </tr>
+                                
+                
+                  
+                <tr class="tabletitle">
+                  <td></td>
+                  <td class="Rate"><h2>Total</h2></td>
+                  <td class="payment"><h2>{{cars.p_hour}}</h2></td>
+                </tr>
+                
+              </table>
+              <form action="" method="POST">
+            <button type="submit" class="btn btn-primary" id="pay-btn">Pay now</button> 
+          </form> 
+            </div><!--End Table-->
+            
+            <div id="legalcopy">
+            </div>
+            
+          </div><!--End InvoiceBot-->
+        </div><!--End Invoice-->
+      </div><!-- End Invoice Holder-->
+      <script src='https://kit.fontawesome.com/a076d05399.js'></script>
+      <script>var dt = new Date();
+        document.getElementById("datetime").innerHTML=dt.toLocaleString();</script>    
+        
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+        <script>
+          var options = {
+             
+            // Enter the Key ID generated from the Dashboard
+            key: "{{ razorpay_merchant_key }}",
+             
+            // Amount is in currency subunits.
+            // Default currency is INR. Hence,
+            // 50000 refers to 50000 paise
+            amount: "{{ razorpay_amount }}",
+            currency: "{{ currency }}",
+             
+            // Your/store name.
+            name: "Dj Razorpay",
+             
+            // Pass the `id` obtained in the response of Step 1
+            order_id: "{{ razorpay_order_id }}",
+            callback_url: "{{ callback_url }}",
+          };
+           
+          // initialise razorpay with the options.
+          var rzp1 = new Razorpay(options);
+           
+          // add event listener to the payment button.
+          document.getElementById("pay-btn").onclick = function (e) {
+            rzp1.open();
+            e.preventDefault();
+          };
+        </script>    
+</body>
+</html>

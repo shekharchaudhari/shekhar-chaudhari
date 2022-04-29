@@ -1,0 +1,71 @@
+{% extends 'header1.html' %}
+
+{% load static%}
+
+{% block content %}
+<section class="ftco-section ftco-cart">
+	<div class="container">
+		<div class="row">
+		<div class="col-md-12 ftco-animate">
+			<div class="car-list">
+				<table class="table">
+					<thead class="thead-primary">
+					  <tr class="text-center">
+						<th>&nbsp;</th>
+						<th>&nbsp;</th>
+						<th class="bg-primary heading">Per Hour Rate</th>
+						<th class="bg-dark heading">Per Day Rate</th>
+					  </tr>
+					</thead>
+					<tbody>
+					{% for one in cars %}	
+					  <tr class="">
+						  <td class="car-image"><div class="img" style="background-image:url('{{one.car_pic.url}}');"></div></td>
+						<td class="product-name">
+							<h3>{{one.car_type}}</h3>
+							<span class="per"><i class='fas fa-gas-pump'></i>&nbsp;&nbsp;{{one.fuel_type}}</span>
+							<p class="mb-0 rated">
+								<span>rated:</span>
+								<span class="ion-ios-star"></span>
+								<span class="ion-ios-star"></span>
+								<span class="ion-ios-star"></span>
+								<span class="ion-ios-star"></span>
+								<span class="ion-ios-star"></span>
+							</p>
+						</td>
+						
+						<td class="price">
+							<p class="btn-custom"><a href="{% url 'summary' one.id %}"
+								>Rent per hour</a></p>
+							<div class="price-rate">
+								<h3>
+									<span class="num"><small class="currency"></small> {{one.p_hour}} &nbsp;<i class="fa fa-rupee"></i></span>
+									<span class="per">/per hour</span>
+								</h3>
+							</div>
+						</td>
+						
+						<td class="price">
+							<p class="btn-custom"><a href="#">Rent per day</a></p>
+							<div class="price-rate">
+								<h3>
+									<span class="num"><small class="currency"></small> {{one.p_day}} &nbsp;<i class="fa fa-rupee"></i></span>
+									<span class="per">/per day</span>
+								</h3>
+						</div>
+						</td>
+
+						
+					  </tr><!-- END TR-->
+                      {% endfor %}
+					  <!-- END TR-->
+					</tbody>
+				  </table>
+			  </div>
+		</div>
+	</div>
+	</div>
+</section>
+<script src='https://kit.fontawesome.com/a076d05399.js'></script>
+
+{% endblock %}

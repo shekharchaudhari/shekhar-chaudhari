@@ -1,50 +1,49 @@
-{% extends 'header.html' %}
+{% extends 'header1.html' %}
+
+{% load static%}
 
 {% block content %}
 
-{% load static%}
-<html>
-    <head>
-      <title>change password</title>
-      <link rel="stylesheet" href='{%static "assets/change_css/change.css" %}'>
-    
-    </head>
-    <body>
+
+  
 
 
-<div class="mainDiv">
-    <div class="cardStyle">
-      <form action='{%url "changepass" %}' method="post" name="changepass" id="changepass">
-        {% csrf_token %}
-        <img src="" id="signupLogo"/>
-        
-        <h2 class="formTitle">
-          Change password
-          <p style="color: red;">{{msg}}</p>
-        </h2>
-        
-        
-      <div class="inputDiv">
-        <label class="inputLabel" for="password">New Password</label>
-        <input type="password" id="password" name="password" required>
-      </div>
-        
-      <div class="inputDiv">
-        <label class="inputLabel" for="confirmPassword">Confirm Password</label>
-        <input type="password" id="cpassword" name="cpassword">
-      </div>
-      
-      <div class="buttonWrapper">
-        <button type="submit" id="submitButton" onclick="validateSignupForm()" class="submitButton pure-button pure-button-primary">
-          <span>change password</span>
-          <span id="loader"></span>
-        </button>
-      </div>
-        
-    </form>
+  <div class="container-xl px-4 mt-4">
+    <!-- Account page navigation-->
+    <hr class="mt-0 mb-4">
+    <div class="row">
+        <div class="col-xl-3">
+        </div>
+        <div class="col-xl-8">
+            <!-- Account details card-->
+            <div class="card mb-4">
+                <div class="card-header">Change password</div>
+                <p style=" color:red">{{msg}}</p>
+                <div class="card-body">
+                    <form action="{% url 'changepass' %}" method = "POST">
+                        {% csrf_token %}
+                        <!-- Form Group (username)-->
+                        <div class="mb-3">
+                            <label class="small mb-1" for="">Old password</label>
+                            <input class="form-control" id="exampleInputEmail" type="password" name="opassword" placeholder="Old password" required>
+                       
+                        <!-- Form Group (email address)-->
+                        <div class="mb-3">
+                            <label class="small mb-1" for="">New password</label>
+                            <input class="form-control" id="password" type="password" name="password" placeholder="New password" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="small mb-1" for="">confirm password</label>
+                            <input class="form-control" id="cpassword" type="password" name="cpassword" placeholder="Confirm password" required >
+                        </div>
+                        <button class="btn btn-primary" type="submit">Save changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-  <script src='{%static "assets/change_js/change.js" %}'></script> 
-</body>
-</html>
+</div>
+
+
 {% endblock %}

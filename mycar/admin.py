@@ -7,4 +7,10 @@ from .models import *
 
 @admin.register(User)
 class AdminUser(admin.ModelAdmin):
-    list_display = ['uname','password','id','email','mobile','address','pic']
+    list_display = ['uname','password','email','mobile','address','pic']
+
+admin.site.register(Trip)
+
+admin.site.register(Car)
+
+admin.site.register(Book)
